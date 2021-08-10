@@ -3,6 +3,7 @@
 //! TODO
 //!
 
+use crate::ssh::ssh_packet::SshPacket;
 use std::net::TcpStream;
 
 pub struct SshConnection {
@@ -26,10 +27,10 @@ impl SshConnection {
         match self.stream {
             Some(_) => println!("Already connected"),
             None => {
-                if let Ok(stream) =
-                    TcpStream::connect(format!("{0}:{1}", self.hostname, self.tcp_port))
-                {
-                    println!("Should connect to {0}:{1}", self.hostname, self.tcp_port);
+                let host = format!("{0}:{1}", self.hostname, self.tcp_port);
+
+                if let Ok(stream) = TcpStream::connect(host) {
+                    println!("Should connect to {0}", host);
                     self.stream = Some(stream);
                 } else {
                     println!("Couldn't connect to server...");
@@ -38,10 +39,11 @@ impl SshConnection {
         }
     }
 
-    pub fn write(&self) {
-        match &self.stream {
-            Some(_stream) => {
-                // stream.write(&[1]);
+    pub fn write(&self, command: String) {
+        match self.stream {
+            Some(stream) => {
+                let ssh_packet = SshPacket::new(command);
+                stream.write(ssh_packet.into_bytes());
                 // stream.read(&mut [0; 128]);
                 todo!()
             }
