@@ -4,6 +4,7 @@
 //!
 
 use crate::ssh::ssh_packet::SshPacket;
+use std::io::Write;
 use std::net::TcpStream;
 
 pub struct SshConnection {
@@ -29,7 +30,7 @@ impl SshConnection {
             None => {
                 let host = format!("{0}:{1}", self.hostname, self.tcp_port);
 
-                if let Ok(stream) = TcpStream::connect(host) {
+                if let Ok(stream) = TcpStream::connect(&host) {
                     println!("Should connect to {0}", host);
                     self.stream = Some(stream);
                 } else {
@@ -39,8 +40,8 @@ impl SshConnection {
         }
     }
 
-    pub fn write(&self, command: String) {
-        match self.stream {
+    pub fn write(&mut self, command: String) {
+        match &mut self.stream {
             Some(stream) => {
                 let ssh_packet = SshPacket::new(command);
                 stream.write(ssh_packet.into_bytes());
