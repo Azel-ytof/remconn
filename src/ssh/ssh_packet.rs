@@ -1,9 +1,27 @@
 use rand::Rng;
 
-/// # SshPacket
+/// A SSH packet corresponding to [RFC4253 documentation]
 ///
-/// A SSH packet corresponding to RFC description
+/// After creating a `SshPacket` by giving the message to send, you can convert it [`into_bytes`] to send it through a buffer
 ///
+/// [RFC4253 documentation]: https://datatracker.ietf.org/doc/html/rfc4253
+/// [`into_bytes`]: SshPacket::into_bytes
+///
+/// # Examples
+///
+/// ```
+/// fn main() -> std::io::Result<()> {
+///     let command = String::from("ls -ali");
+///
+///     let ssh_packet = SshPacket::new(command);
+///     let buffer = ssh_packet.into_bytes();
+///
+///     match stream.write(&buffer[..]) {
+///         Ok(_) => println!("Buffer write OK"),
+///         Err(e) => println!("err : {0}", e),
+///     }
+/// }
+/// ```
 pub struct SshPacket {
     packet_length: u32,
     padding_length: u8,
@@ -13,6 +31,7 @@ pub struct SshPacket {
 }
 
 impl SshPacket {
+    /// Create an instance by giving the message to send
     pub fn new(payload: String) -> Self {
         let padding_length = 8;
         let random_padding = SshPacket::generate_random_padding(padding_length);
@@ -28,6 +47,7 @@ impl SshPacket {
         }
     }
 
+    /// Convert and consume the current instance to a vector of u8
     pub fn into_bytes(self) -> Vec<u8> {
         let mut final_packet: Vec<u8> = Vec::new();
 
@@ -40,6 +60,7 @@ impl SshPacket {
         final_packet
     }
 
+    /// Generate the random padding based on length specified while instanciating the struct
     fn generate_random_padding(padding_length: u8) -> Vec<u8> {
         let mut a = vec![0; padding_length as usize];
 
