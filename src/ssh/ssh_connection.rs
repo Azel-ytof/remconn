@@ -44,7 +44,11 @@ impl SshConnection {
         match &mut self.stream {
             Some(stream) => {
                 let ssh_packet = SshPacket::new(command);
-                stream.write(ssh_packet.into_bytes());
+                let buffer = ssh_packet.into_bytes();
+                match stream.write(&buffer[..]) {
+                    Ok(_) => println!("ok"),
+                    Err(e) => println!("err : {0}", e),
+                }
                 // stream.read(&mut [0; 128]);
                 todo!()
             }

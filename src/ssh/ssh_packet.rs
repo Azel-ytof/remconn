@@ -1,10 +1,9 @@
-//! # SshPacket
-//!
-//! TODO
-//!
-
 use rand::Rng;
 
+/// # SshPacket
+///
+/// A SSH packet corresponding to RFC description
+///
 pub struct SshPacket {
     packet_length: u32,
     padding_length: u8,
@@ -29,7 +28,7 @@ impl SshPacket {
         }
     }
 
-    pub fn into_bytes(self) -> &'static [u8] {
+    pub fn into_bytes(self) -> Vec<u8> {
         let mut final_packet: Vec<u8> = Vec::new();
 
         final_packet.extend_from_slice(&self.packet_length.to_be_bytes());
@@ -38,7 +37,7 @@ impl SshPacket {
         final_packet.extend(self.random_padding.clone());
         // final_packet.push(self.mac);
 
-        &final_packet[..]
+        final_packet
     }
 
     fn generate_random_padding(padding_length: u8) -> Vec<u8> {
