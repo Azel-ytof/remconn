@@ -56,3 +56,20 @@ impl SshPacket {
         a
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_random_padding() {
+        let length: usize = 8;
+        let random_padding = SshPacket::generate_random_padding(length as u8);
+
+        assert_eq!(
+            length,
+            random_padding.len(),
+            "Verifying random padding length"
+        );
+    }
+}

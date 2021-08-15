@@ -208,8 +208,6 @@ mod tests {
 
         let mut ssh_connection = SshConnection::new(hostname, tcp_port, user);
 
-        if let Err(e) = ssh_connection.connect() {
-            println!("Error : {0}", e);
-        }
+        assert!(ssh_connection.connect().is_err());
     }
 }
