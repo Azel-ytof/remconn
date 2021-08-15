@@ -12,3 +12,4 @@ https://datatracker.ietf.org/doc/html/rfc4253
 https://datatracker.ietf.org/doc/html/rfc4254
 
 https://github.com/gbonacini/tssh
+https://blog.guillaume-gomez.fr/Rust/3/6

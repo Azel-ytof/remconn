@@ -1,7 +1,7 @@
 use crate::errors::SshError;
 use crate::ssh::ssh_packet::SshPacket;
-use std::io::Write;
-use std::net::TcpStream;
+use std::io::{Read, Write};
+use std::net::{Shutdown, TcpStream};
 
 pub const LOCALHOST_HOSTNAME: &str = "127.0.0.1";
 pub const DEFAULT_TCP_PORT: &str = "22";
@@ -140,15 +140,23 @@ impl SshConnection {
     /// }
     /// ```
     pub fn send(&mut self, command: String) -> Result<(), SshError> {
+        let buffer = &mut [0; 128];
+
         match &mut self.stream {
             Some(stream) => {
                 let ssh_packet = SshPacket::new(command);
-                let buffer = ssh_packet.into_bytes();
-                match stream.write(&buffer[..]) {
-                    Ok(_) => {
-                        // stream.read(&mut [0; 128]);
-                        todo!()
-                    }
+                let ssh_packet_bytes = ssh_packet.into_bytes();
+
+                match stream.write(&ssh_packet_bytes[..]) {
+                    Ok(input_length) => match stream.read(buffer) {
+                        Ok(output_length) => todo!(),
+                        Err(e) => {
+                            return Err(SshError::new(format!(
+                                "An error occured while reading datas : {0}",
+                                e,
+                            )))
+                        }
+                    },
                     Err(e) => {
                         return Err(SshError::new(format!(
                             "An error occured while sending datas : {0}",
@@ -187,12 +195,22 @@ impl SshConnection {
     /// ssh_connection.disconnect();
     /// // Be care, the instance is consume next this called
     /// ```
-    pub fn disconnect(self) {
-        println!(
-            "Should disconnect from {0}:{1}",
-            self.hostname, self.tcp_port
-        );
-        // todo!();
+    pub fn disconnect(self) -> Result<(), SshError> {
+        match self.stream {
+            Some(stream) => {
+                if let Err(e) = stream.shutdown(Shutdown::Both) {
+                    Err(SshError::new(format!(
+                        "An error occured while shutting down the stream : {0}",
+                        e,
+                    )))
+                } else {
+                    Ok(())
+                }
+            }
+            None => Err(SshError::new(String::from(
+                "You have to connect to the server before disconnecting",
+            ))),
+        }
     }
 }
 
