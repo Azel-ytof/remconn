@@ -6,22 +6,6 @@ use rand::Rng;
 ///
 /// [RFC4253 documentation]: https://datatracker.ietf.org/doc/html/rfc4253
 /// [`into_bytes`]: SshPacket::into_bytes
-///
-/// # Examples
-///
-/// ```
-/// fn main() -> std::io::Result<()> {
-///     let command = String::from("ls -ali");
-///
-///     let ssh_packet = SshPacket::new(command);
-///     let buffer = ssh_packet.into_bytes();
-///
-///     match stream.write(&buffer[..]) {
-///         Ok(_) => println!("Buffer write OK"),
-///         Err(e) => println!("err : {0}", e),
-///     }
-/// }
-/// ```
 pub struct SshPacket {
     packet_length: u32,
     padding_length: u8,

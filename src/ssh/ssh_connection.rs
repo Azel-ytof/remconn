@@ -13,6 +13,8 @@ pub const DEFAULT_TCP_PORT: &str = "22";
 /// # Examples
 ///
 /// ```
+/// use remconn::ssh::ssh_connection::SshConnection;
+///
 /// let hostname = String::from(remconn::ssh::ssh_connection::LOCALHOST_HOSTNAME);
 /// let tcp_port = String::from(remconn::ssh::ssh_connection::DEFAULT_TCP_PORT);
 /// let user = String::from("admin");
@@ -50,6 +52,8 @@ impl SshConnection {
     /// # Examples
     ///
     /// ```
+    /// use remconn::ssh::ssh_connection::SshConnection;
+    ///
     /// let hostname = String::from(remconn::ssh::ssh_connection::LOCALHOST_HOSTNAME);
     /// let tcp_port = String::from(remconn::ssh::ssh_connection::DEFAULT_TCP_PORT);
     /// let user = String::from("user");
@@ -73,10 +77,20 @@ impl SshConnection {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```
+    /// use remconn::ssh::ssh_connection::SshConnection;
+    ///
+    /// let hostname = String::from(remconn::ssh::ssh_connection::LOCALHOST_HOSTNAME);
+    /// let tcp_port = String::from(remconn::ssh::ssh_connection::DEFAULT_TCP_PORT);
+    /// let user = String::from("user");
+    ///
+    /// let mut ssh_connection = SshConnection::new(hostname, tcp_port, user);
+    ///
     /// // ssh_connection already instanciate before
-    /// if let Err(e) = ssh_connection.connect() {
-    ///     println!("Error : {0}", e);
+    /// if let Ok(_) = ssh_connection.connect() {
+    ///     println!("Connected to the server !");
+    /// } else {
+    ///     println!("Couldn't connect to the server...");
     /// }
     /// ```
     pub fn connect(&mut self) -> Result<(), SshError> {
@@ -107,10 +121,22 @@ impl SshConnection {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// // ssh_connection already instanciate and been connected before
-    /// if let Err(e) = ssh_connection.send(String::from("echo test")) {
-    ///     println!("Error : {0}", e);
+    /// ```
+    /// use remconn::ssh::ssh_connection::SshConnection;
+    ///
+    /// let hostname = String::from(remconn::ssh::ssh_connection::LOCALHOST_HOSTNAME);
+    /// let tcp_port = String::from(remconn::ssh::ssh_connection::DEFAULT_TCP_PORT);
+    /// let user = String::from("user");
+    ///
+    /// let mut ssh_connection = SshConnection::new(hostname, tcp_port, user);
+    ///
+    /// // Result to handle
+    /// ssh_connection.connect();
+    ///
+    /// if let Ok(_) = ssh_connection.send(String::from("echo test")) {
+    ///     println!("Message sent to the host");
+    /// } else {
+    ///     println!("Couldn't send message to the host");
     /// }
     /// ```
     pub fn send(&mut self, command: String) -> Result<(), SshError> {
@@ -143,16 +169,47 @@ impl SshConnection {
     ///
     /// # Examples
     ///
-    /// ```no_run
-    /// // ssh_connection already instanciate and been connected before
+    /// ```
+    /// use remconn::ssh::ssh_connection::SshConnection;
+    ///
+    /// let hostname = String::from(remconn::ssh::ssh_connection::LOCALHOST_HOSTNAME);
+    /// let tcp_port = String::from(remconn::ssh::ssh_connection::DEFAULT_TCP_PORT);
+    /// let user = String::from("user");
+    ///
+    /// let mut ssh_connection = SshConnection::new(hostname, tcp_port, user);
+    ///
+    /// // Result to handle
+    /// ssh_connection.connect();
+    ///
+    /// // Result to handle
+    /// ssh_connection.send(String::from("echo test"));
+    ///
     /// ssh_connection.disconnect();
-    /// // Be care, instance is consume next this called
+    /// // Be care, the instance is consume next this called
     /// ```
     pub fn disconnect(self) {
         println!(
             "Should disconnect from {0}:{1}",
             self.hostname, self.tcp_port
         );
-        todo!();
+        // todo!();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_connect_unknown_host() {
+        let hostname = String::from("unknown_host");
+        let tcp_port = String::from(DEFAULT_TCP_PORT);
+        let user = String::from("admin");
+
+        let mut ssh_connection = SshConnection::new(hostname, tcp_port, user);
+
+        if let Err(e) = ssh_connection.connect() {
+            println!("Error : {0}", e);
+        }
     }
 }
