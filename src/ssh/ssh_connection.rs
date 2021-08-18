@@ -105,9 +105,8 @@ impl SshConnection {
 
         match TcpStream::connect(&host) {
             Ok(stream) => {
-                println!("Should connect to {0}", host);
                 self.stream = Some(stream);
-                todo!()
+                Ok(())
             }
             Err(e) => Err(SshError::new(format!(
                 "Couldn't connect to server : {0}",
