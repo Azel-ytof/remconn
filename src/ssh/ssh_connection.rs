@@ -145,16 +145,23 @@ impl SshConnection {
         match &mut self.stream {
             Some(stream) => {
                 let ssh_packet = SshPacket::new(command);
-                let ssh_packet_bytes = ssh_packet.into_bytes();
 
-                if let Err(e) = stream.write(&ssh_packet_bytes[..]) {
-                    return Err(SshError::new(format!(
-                        "An error occured while sending datas : {0}",
-                        e,
-                    )));
+                match ssh_packet.into_bytes() {
+                    Ok(ssh_packet_bytes) => {
+                        if let Err(e) = stream.write(&ssh_packet_bytes[..]) {
+                            return Err(SshError::new(format!(
+                                "An error occured while sending datas : {0}",
+                                e,
+                            )));
+                        }
+
+                        Ok(())
+                    }
+                    Err(e) => Err(SshError::new(format!(
+                        "An error occured while creating SSH packets : {0}",
+                        e
+                    ))),
                 }
-
-                Ok(())
             }
             None => {
                 return Err(SshError::new(String::from(
