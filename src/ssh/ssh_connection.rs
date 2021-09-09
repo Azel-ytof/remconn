@@ -97,7 +97,7 @@ impl SshConnection {
     /// }
     /// ```
     pub fn connect(&mut self) -> Result<(), SshError> {
-        if let Some(_) = self.stream {
+        if self.stream.is_some() {
             return Err(SshError::new(String::from("Already connected")));
         }
 
@@ -163,11 +163,9 @@ impl SshConnection {
                     ))),
                 }
             }
-            None => {
-                return Err(SshError::new(String::from(
-                    "You have to connect to the server before sending commands",
-                )))
-            }
+            None => Err(SshError::new(String::from(
+                "You have to connect to the server before sending commands",
+            ))),
         }
     }
 
@@ -211,11 +209,9 @@ impl SshConnection {
 
                 Ok(self.get_string_from_slice(buffer))
             }
-            None => {
-                return Err(SshError::new(String::from(
-                    "You have to connect to the server before reading",
-                )))
-            }
+            None => Err(SshError::new(String::from(
+                "You have to connect to the server before reading",
+            ))),
         }
     }
 

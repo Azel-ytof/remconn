@@ -40,7 +40,7 @@ impl SshPacket {
         final_packet.extend_from_slice(&self.packet_length.to_be_bytes());
         final_packet.push(self.padding_length);
         final_packet.extend_from_slice(self.payload.as_bytes());
-        final_packet.extend(self.random_padding.clone());
+        final_packet.extend(self.random_padding);
 
         if final_packet.len() < 16 {
             return Err(SshError::new(String::from(
